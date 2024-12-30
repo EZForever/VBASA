@@ -1,0 +1,9 @@
+[
+	uuid(8781D079-C48F-4FA2-9AB6-BABCC38D8F02),
+	version(1.0),
+	helpstring("VBASA Type Library")
+]
+library VBASA
+{
+	// Empty
+}

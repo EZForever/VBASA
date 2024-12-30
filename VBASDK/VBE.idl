@@ -1,0 +1,1175 @@
+import "ocidl.idl";
+
+[uuid(c708ef4d-20be-4c24-be97-b35e6988d83c)]
+[version(6.4)]
+[helpstring("UNOFFICIAL Microsoft Visual Basic for Applications 6.0+ Type Library")]
+[helpfile("VBA6SDK.CHM")]
+[helpcontext(00000000)]
+library VBE {
+    importlib("stdole2.tlb");
+    
+    // --- Forward Declarations ---
+    #if 1
+    
+    interface IVba;
+    interface IVbaProject;
+    interface IVbaProjItem;
+    interface IVbaProcs;
+    interface IVbaProjItemCol;
+    interface IMsoComponentManager;
+    interface IOleComponentUIManager;
+    interface IVbaSite;
+    interface IVbaCompManagerSite;
+    interface IVbaProjectSecurity;
+    
+    // ---
+
+    interface IOleControlSite;
+    interface IPropertyNotifySink;
+
+    #endif
+    
+    // --- Enums ---
+    #if 1
+    
+    typedef enum GETOBJS {
+        GETOBJS_ALL = 1,
+        GETOBJS_SELECTED = 2,
+    } GETOBJS;
+
+    typedef enum SELOBJS {
+        SELOBJS_ACTIVATE_WINDOW = 1,
+    } SELOBJS;
+
+    // ---
+
+    typedef enum ACTFLAG /* : DWORD */ {
+        ACT_DEFAULT = 0x00000000,
+        ACT_SHOW = 0x00000001,
+    } ACTFLAG;
+
+    typedef enum PROPCAT /* : int */ {
+        PROPCAT_Nil = -1,
+        PROPCAT_Misc = -2,
+        PROPCAT_Font = -3,
+        PROPCAT_Position = -4,
+        PROPCAT_Appearance = -5,
+        PROPCAT_Behavior = -6,
+        PROPCAT_Data = -7,
+        PROPCAT_List = -8,
+        PROPCAT_Text = -9,
+        PROPCAT_Scale = -10,
+        PROPCAT_DDE = -11,
+    } PROPCAT;
+
+    typedef enum HELPINFOFLAGS { // ???
+        HELPINFO_WHATS_THIS_MODE_ON = 1,
+    } HELPINFOFLAGS;
+
+    // ---
+
+    typedef enum VBAMODTYPE /* : DWORD */ {
+        VBAMODTYPE_StdMod = 1,
+        VBAMODTYPE_ClassMod = 2,
+    } VBAMODTYPE;
+    
+    typedef enum VBAERRORS /* : HRESULT */ {
+        VBA_E_NOUSERACTION            = 0x800A9D15,
+        VBA_E_NOTOBJECT               = 0x800A01A8,
+        VBA_E_EXPECTEDFUNCNOTVAR      = 0x800A88CA,
+        VBA_E_SYNTAX                  = 0x800A9C70,
+        VBA_E_UNDEFINEDTYPE           = 0x800A8027,
+        VBA_E_INVALIDPROCNAME         = 0x800A9C82,
+        VBA_E_UNDEFINEDPROC           = 0x800A0023,
+        VBA_E_CANTEXECCODEINBREAKMODE = 0x800ADF09,
+        VBA_E_MACROSDISABLED          = 0x800ADF23,
+        VBA_E_MODNAMECONFLICT         = 0x800A802D,
+        VBA_E_INVALIDSTATE            = 0x800A8029,
+        VBA_E_UNSUPFORMAT             = 0x800A8019,
+        VBA_E_ALREADYRECORDING        = 0x800AC470,
+        VBA_E_PROJECTPROTECTED        = 0x800AC471,
+        VBA_E_EXCEPTION               = 0x800AC461,
+        VBA_E_IGNORE                  = 0x800AC472,
+        VBA_E_RESET                   = 0x800A9C68,
+        VBA_E_CANTEXITDESIGNMODE      = 0x800ADF21,
+        VBA_E_CANTCONTINUE            = 0x800A0011,
+        VBA_E_MODULENOTFOUND          = 0x800A9C86,
+        VBA_E_PROJECTNOTFOUND         = 0x800A9C87,
+        VBA_E_COMPERRINHIDDENMODULE   = 0x800A9D09,
+        VBA_E_RECORDMODCANTCHANGE     = 0x800A9D32,
+        VBA_E_COMPILEERROR            = 0x800A9C64,
+        VBA_E_ILLEGALNAME             = 0x800AC3D4,
+        VBA_E_FILENOTFOUND            = 0x800A0035,
+        VBA_E_PATHNOTFOUND            = 0x800A004C,
+        VBA_E_CLASSNOTREG             = 0x800A02C9,
+        VBA_E_COULDNTLOADFILE         = 0x800AC389
+    } VBAERRORS;
+    
+    typedef enum VBASAPROJTYPE { 
+        VBASAPT_NONE = 1,
+        VBASAPT_MT,
+    } VBASAPROJTYPE;
+    
+    typedef enum VBASAFLAGS /* : WORD */ {
+        vsaFLAG_CmdLineSupported = 1
+    } VBASAFLAGS;
+    
+    typedef enum VBAINITINFOFLAGS /* : DWORD */ { // ???
+        VBAINITINFO_UseWinHelp = 0x0001,
+        VBAINITINFO_SupportVbaDesigners = 0x0002,
+        VBAINITINFO_EnableDigitalSignatures = 0x0004,
+        VBAINITINFO_MessageLoopWide = 0x0008,
+        VBAINITINFO_DisableIDE = 0x10000
+    } VBAINITINFOFLAGS;
+    
+    typedef enum VBASTEPMODE {
+        VBASTEPMODE_None,
+        VBASTEPMODE_Into,
+        VBASTEPMODE_Over,
+    } VBASTEPMODE;
+    
+    typedef enum VBASITENOTIFY {
+        VBAHN_ExecuteCodeBegin,
+        VBAHN_ExecuteCodeEnd,
+        VBAHN_Activate,
+        VBAHN_Reset,
+        VBAHN_ModalDlgBegin,
+        VBAHN_ModalDlgEnd,
+        VBAHN_ResetToolbar,
+    } VBASITENOTIFY;
+    
+    typedef enum VBA_BRKREASON {
+        VBA_BRKREASON_Error,
+        VBA_BRKREASON_UserInterrupt,
+        VBA_BRKREASON_Breakpoint,
+        VBA_BRKREASON_WatchBreak,
+        VBA_BRKREASON_HostBreak,
+        VBA_BRKREASON_CompileError,
+        VBA_BRKREASON_Assert,
+    } VBA_BRKREASON;
+    
+    typedef enum VBA_BRKOPT {
+        VBA_BRKOPT_Continue,
+        VBA_BRKOPT_Debug,
+        VBA_BRKOPT_End,
+        VBA_BRKOPT_InterruptError,
+        VBA_BRKOPT_ContinueNoReset,
+    } VBA_BRKOPT;
+
+    typedef enum VBAPROJSITENOTIFY {
+        VBAPSN_AfterProjectReset,
+        VBAPSN_Activate,
+        VBAPSN_ModalDlgBegin,
+        VBAPSN_ModalDlgEnd,
+        VBAPSN_SearchReplaceBegin,
+        VBAPSN_SearchReplaceEnd,
+    } VBAPROJSITENOTIFY;
+
+    typedef enum VBAPROJITEMTYPE {
+        VBAPIT_StdModule,
+        VBAPIT_ClassModule,
+        VBAPIT_Designer,
+        VBAPIT_DocumentObject,
+        VBAPIT_DocumentClass,
+        VBAPIT_Other,
+    } VBAPROJITEMTYPE;
+
+    typedef enum VBA_PROJECT_MODE {
+        VBA_PROJ_MODE_Design,
+        VBA_PROJ_MODE_Use,
+    } VBA_PROJECT_MODE;
+    
+    typedef enum VBAPROJFLAGS /* : WORD */ {
+        VBAPROJFLAG_None = 0x0000,
+        VBAPROJFLAG_Hidden = 0x0001,
+        VBAPROJFLAG_DisableMacros = 0x0002,
+        VBAPROJFLAG_DisableSave = 0x0004,
+    } VBAPROJFLAGS;
+        
+    typedef enum VBA_PROCESS_MODE {
+        VBA_PROC_MODE_Wait,
+        VBA_PROC_MODE_Run,
+        VBA_PROC_MODE_Break,
+    } VBA_PROCESS_MODE;
+    
+    typedef enum VBAPROCFLAGS {
+        VBAPROCFLAG_None = 0x0000,
+        VBAPROCFLAG_Public = 0x0001,
+        VBAPROCFLAG_Private = 0x0002,
+        VBAPROCFLAG_Sub = 0x0004,
+        VBAPROCFLAG_Function = 0x0008,
+        VBAPROCFLAG_NoParameters = 0x0010,
+    } VBAPROCFLAGS;
+    
+    typedef enum PROTECTIONSTATE {
+        Protection_None = 0,
+        Protection_User = 1,
+        Protection_Host = 2,
+        Protection_VBA = 4,
+    } PROTECTIONSTATE;
+    
+    typedef enum VBAIDLEFLAGS /* : WORD */ { // ???
+        VBAIDLEFLAG_Periodic = 0x0001,
+        VBAIDLEFLAG_NonPeriodic = 0x0002,
+        VBAIDLEFLAG_Priority = 0x0004,
+    } VBAIDLEFLAGS;
+    
+    typedef enum VBAINFOFLAGS /* : WORD */ { // ???
+        VBAINFOFLAG_ExclusiveBorderSpace = 0x0001,
+    } VBAINFOFLAGS;
+    
+    typedef enum VBACMSITENOTIFY {
+        VBACMSN_LostActivation = 1,
+        VBACMSN_HideBorderTools = 2,
+        VBACMSN_TrackingBegins = 3,
+        VBACMSN_TrackingEnds = 4,
+    } VBACMSITENOTIFY;
+    
+    typedef enum VBACOMPSTATE {
+        VBACOMPSTATE_Modal = 1,
+        VBACOMPSTATE_RedrawOff = 2,
+        VBACOMPSTATE_WarningsOff = 3,
+        VBACOMPSTATE_Recording = 4,
+    } VBACOMPSTATE;
+    
+    typedef enum VBALOOPREASON {
+        VBALOOPREASON_FocusWait = 1,
+        VBALOOPREASON_DoEvents = 2,
+        VBALOOPREASON_Debug = 3,
+        VBALOOPREASON_ModalForm = 4,
+    } VBALOOPREASON;
+    
+    typedef enum VBARECORD { // ???
+        VBARECORD_ActionMax = 10,
+    } VBARECORD;
+    
+    typedef enum VBAMACROENABLESTATE {
+        VBAMacroEnable_Enable = 1,
+        VBAMacroEnable_Disable = 2,
+        VBAMacroEnable_DontOpen = 3,
+    } VBAMACROENABLESTATE;
+    
+    typedef enum VBADIGSIGSECURITYLEVEL {
+        VBASecurityLevel_Undefined,
+        VBASecurityLevel_None,
+        VBASecurityLevel_Medium,
+        VBASecurityLevel_High,
+        VBASecurityLevel_VeryHigh,
+    } VBADIGSIGSECURITYLEVEL;
+    
+    typedef enum VBAINITHOSTADDININFOFLAGS {
+        VBAINITHOSTADDININFO_DisableOnStartup = 0x00000002,
+    } VBAINITHOSTADDININFOFLAGS;
+    
+    typedef enum KWID /* : UINT */ {
+        KWID_tkNone = 0,
+        KWID_tkABS = 1,
+        KWID_tkACCESS = 2,
+        KWID_tkADDRESSOF = 3,
+        KWID_tkALIAS = 4,
+        KWID_tkAND = 5,
+        KWID_tkANY = 6,
+        KWID_tkAPPEND = 7,
+        KWID_tkARRAY = 8,
+        KWID_tkAS = 9,
+        KWID_tkASSERT = 10,
+        KWID_tkB = 11,
+        KWID_tkBASE = 12,
+        KWID_tkBF = 13,
+        KWID_tkBINARY = 14,
+        KWID_tkBOOLEAN = 15,
+        KWID_tkBYREF = 16,
+        KWID_tkBYTE = 17,
+        KWID_tkBYVAL = 18,
+        KWID_tkCALL = 19,
+        KWID_tkCASE = 20,
+        KWID_tkCBOOL = 21,
+        KWID_tkCBYTE = 22,
+        KWID_tkCCUR = 23,
+        KWID_tkCDATE = 24,
+        KWID_tkCDEC = 25,
+        KWID_tkCDBL = 26,
+        KWID_tkCDECL = 27,
+        KWID_tkCHDIR = 28,
+        KWID_tkCINT = 29,
+        KWID_tkCIRCLE = 30,
+        KWID_tkCLNG = 31,
+        KWID_tkCLOSE = 32,
+        KWID_tkCOMPARE = 33,
+        KWID_tkCONST = 34,
+        KWID_tkCSNG = 35,
+        KWID_tkCSTR = 36,
+        KWID_tkCURDIR = 37,
+        KWID_tkCURDIRstr = 38,
+        KWID_tkCVAR = 39,
+        KWID_tkCVDATE = 40,
+        KWID_tkCVERR = 41,
+        KWID_tkCURRENCY = 42,
+        KWID_tkDATABASE = 43,
+        KWID_tkDATE = 44,
+        KWID_tkDATEstr = 45,
+        KWID_tkDEBUG = 46,
+        KWID_tkDECIMAL = 47,
+        KWID_tkDECLARE = 48,
+        KWID_tkDEFBOOL = 49,
+        KWID_tkDEFBYTE = 50,
+        KWID_tkDEFCUR = 51,
+        KWID_tkDEFDATE = 52,
+        KWID_tkDEFDEC = 53,
+        KWID_tkDEFDBL = 54,
+        KWID_tkDEFINT = 55,
+        KWID_tkDEFLNG = 56,
+        KWID_tkDEFOBJ = 57,
+        KWID_tkDEFSNG = 58,
+        KWID_tkDEFSTR = 59,
+        KWID_tkDEFVAR = 60,
+        KWID_tkDIM = 61,
+        KWID_tkDIR = 62,
+        KWID_tkDIRstr = 63,
+        KWID_tkDO = 64,
+        KWID_tkDOEVENTS = 65,
+        KWID_tkDOUBLE = 66,
+        KWID_tkEACH = 67,
+        KWID_tkELSE = 68,
+        KWID_tkELSEIF = 69,
+        KWID_tkEMPTY = 70,
+        KWID_tkEND = 71,
+        KWID_tkENDIF = 72,
+        KWID_tkENUM = 73,
+        KWID_tkEQV = 74,
+        KWID_tkERASE = 75,
+        KWID_tkERROR = 76,
+        KWID_tkERRORstr = 77,
+        KWID_tkEVENT = 78,
+        KWID_tkEXIT = 79,
+        KWID_tkEXPLICIT = 80,
+        KWID_tkF = 81,
+        KWID_tkFALSE = 82,
+        KWID_tkFIX = 83,
+        KWID_tkFOR = 84,
+        KWID_tkFORMAT = 85,
+        KWID_tkFORMATstr = 86,
+        KWID_tkFREEFILE = 87,
+        KWID_tkFRIEND = 88,
+        KWID_tkFUNCTION = 89,
+        KWID_tkGET = 90,
+        KWID_tkGLOBAL = 91,
+        KWID_tkGO = 92,
+        KWID_tkGOSUB = 93,
+        KWID_tkGOTO = 94,
+        KWID_tkIF = 95,
+        KWID_tkIMP = 96,
+        KWID_tkIMPLEMENTS = 97,
+        KWID_tkIN = 98,
+        KWID_tkINPUT = 99,
+        KWID_tkINPUTstr = 100,
+        KWID_tkINPUTB = 101,
+        KWID_tkINPUTBstr = 102,
+        KWID_tkINSTR = 103,
+        KWID_tkINSTRB = 104,
+        KWID_tkINT = 105,
+        KWID_tkINTEGER = 106,
+        KWID_tkIS = 107,
+        KWID_tkLBOUND = 108,
+        KWID_tkLEFT = 109,
+        KWID_tkLEN = 110,
+        KWID_tkLENB = 111,
+        KWID_tkLET = 112,
+        KWID_tkLIB = 113,
+        KWID_tkLIKE = 114,
+        KWID_tkLINE = 115,
+        KWID_tkLINEINPUT = 116,
+        KWID_tkLOAD = 117,
+        KWID_tkLOCAL = 118,
+        KWID_tkLOCK = 119,
+        KWID_tkLONG = 120,
+        KWID_tkLOOP = 121,
+        KWID_tkLSET = 122,
+        KWID_tkME = 123,
+        KWID_tkMID = 124,
+        KWID_tkMIDstr = 125,
+        KWID_tkMIDB = 126,
+        KWID_tkMIDBstr = 127,
+        KWID_tkMOD = 128,
+        KWID_tkMODULE = 129,
+        KWID_tkNAME = 130,
+        KWID_tkNEW = 131,
+        KWID_tkNEXT = 132,
+        KWID_tkNOT = 133,
+        KWID_tkNOTHING = 134,
+        KWID_tkNULL = 135,
+        KWID_tkOBJECT = 136,
+        KWID_tkON = 137,
+        KWID_tkOPEN = 138,
+        KWID_tkOPTION = 139,
+        KWID_tkOPTIONAL = 140,
+        KWID_tkOR = 141,
+        KWID_tkOUTPUT = 142,
+        KWID_tkPARAMARRAY = 143,
+        KWID_tkPRESERVE = 144,
+        KWID_tkPRINT = 145,
+        KWID_tkPRIVATE = 146,
+        KWID_tkPROPERTY = 147,
+        KWID_tkPSET = 148,
+        KWID_tkPUBLIC = 149,
+        KWID_tkPUT = 150,
+        KWID_tkRAISEEVENT = 151,
+        KWID_tkRANDOM = 152,
+        KWID_tkRANDOMIZE = 153,
+        KWID_tkREAD = 154,
+        KWID_tkREDIM = 155,
+        KWID_tkREM = 156,
+        KWID_tkRESUME = 157,
+        KWID_tkRETURN = 158,
+        KWID_tkRGB = 159,
+        KWID_tkRSET = 160,
+        KWID_tkSCALE = 161,
+        KWID_tkSEEK = 162,
+        KWID_tkSELECT = 163,
+        KWID_tkSET = 164,
+        KWID_tkSGN = 165,
+        KWID_tkSHARED = 166,
+        KWID_tkSINGLE = 167,
+        KWID_tkSPC = 168,
+        KWID_tkSTATIC = 169,
+        KWID_tkSTEP = 170,
+        KWID_tkSTOP = 171,
+        KWID_tkSTRCOMP = 172,
+        KWID_tkSTRING = 173,
+        KWID_tkSTRINGstr = 174,
+        KWID_tkSUB = 175,
+        KWID_tkTAB = 176,
+        KWID_tkTEXT = 177,
+        KWID_tkTHEN = 178,
+        KWID_tkTO = 179,
+        KWID_tkTRUE = 180,
+        KWID_tkTYPE = 181,
+        KWID_tkTYPEOF = 182,
+        KWID_tkUBOUND = 183,
+        KWID_tkUNLOAD = 184,
+        KWID_tkUNLOCK = 185,
+        KWID_tkUNKNOWN = 186,
+        KWID_tkUNTIL = 187,
+        KWID_tkVARIANT = 188,
+        KWID_tkWEND = 189,
+        KWID_tkWHILE = 190,
+        KWID_tkWIDTH = 191,
+        KWID_tkWITH = 192,
+        KWID_tkWITHEVENTS = 193,
+        KWID_tkWRITE = 194,
+        KWID_tkXOR = 195,
+        KWID_tkHackConst = 196,
+        KWID_tkHackElse = 197,
+        KWID_tkHackElseif = 198,
+        KWID_tkHackEnd = 199,
+        KWID_tkHackIf = 200,
+        KWID_tkATTRIBUTE = 201,
+        KWID_tkVB_BASE = 202,
+        KWID_tkVB_CONTROL = 203,
+        KWID_tkVB_CREATABLE = 204,
+        KWID_tkVB_CUSTOMIZABLE = 205,
+        KWID_tkVB_DESCRIPTION = 206,
+        KWID_tkVB_EXPOSED = 207,
+        KWID_tkVB_EXT_KEY = 208,
+        KWID_tkVB_HELPID = 209,
+        KWID_tkVB_INVOKE_FUNC = 210,
+        KWID_tkVB_INVOKE_PROPERTYGET = 211,
+        KWID_tkVB_INVOKE_PROPERTYPUT = 212,
+        KWID_tkVB_INVOKE_PROPERTYPUTREF = 213,
+        KWID_tkVB_MEMBERFLAGS = 214,
+        KWID_tkVB_NAME = 215,
+        KWID_tkVB_PREDECLID = 216,
+        KWID_tkVB_PROCDATA = 217,
+        KWID_tkVB_TEMPLATEDERIVED = 218,
+        KWID_tkVB_VARDESCRIPTION = 219,
+        KWID_tkVB_VARHELPID = 220,
+        KWID_tkVB_VARMEMBERFLAGS = 221,
+        KWID_tkVB_VARPROCDATA = 222,
+        KWID_tkVB_USERMEMID = 223,
+        KWID_tkVB_VARUSERMEMID = 224,
+        KWID_tkVB_GLOBALNAMESPACE = 225,
+        KWID_tkListSep = 226,
+        KWID_tkDecimalSep = 227,
+        KWID_tkDQuote = 228,
+        KWID_tkLineCont = 229,
+        KWID_tkUnused08 = 230,
+        KWID_tkUnused09 = 231,
+        KWID_tkUnused10 = 232,
+        KWID_tkUnused11 = 233,
+        KWID_tkUnused12 = 234,
+        KWID_tkUnused13 = 235,
+        KWID_tkUnused14 = 236,
+        KWID_tkUnused15 = 237,
+        KWID_tkUnused16 = 238,
+        KWID_tkUnused17 = 239,
+        KWID_tkUnused18 = 240,
+        KWID_tkUnused19 = 241,
+        KWID_tkUnused20 = 242,
+        KWID_tkID = 243,
+        KWID_tkBang = 244,
+        KWID_tkSharp = 245,
+        KWID_tkConcat = 246,
+        KWID_tkSQuote = 247,
+        KWID_tkLParen = 248,
+        KWID_tkRParen = 249,
+        KWID_tkMult = 250,
+        KWID_tkPlus = 251,
+        KWID_tkMinus = 252,
+        KWID_tkDot = 253,
+        KWID_tkDiv = 254,
+        KWID_tkColon = 255,
+        KWID_tkSColon = 256,
+        KWID_tkLT = 257,
+        KWID_tkLE = 258,
+        KWID_tkNE = 259,
+        KWID_tkEQ = 260,
+        KWID_tkLE2 = 261,
+        KWID_tkGE2 = 262,
+        KWID_tkGT = 263,
+        KWID_tkNE2 = 264,
+        KWID_tkGE = 265,
+        KWID_tkQMark = 266,
+        KWID_tkIDiv = 267,
+        KWID_tkPwr = 268,
+        KWID_tkColEq = 269,
+        KWID_tkComma = 270,
+        CCH_MAX_KEYWORD_LEN = 80,
+        CCH_MAX_LINE_LEN = 1023,
+    } KWID;
+
+    // ---
+
+    typedef enum DWCTRLCOOKIE { // ???
+        DWCTRLCOOKIE_Nil = 0xffffffff,
+    } DWCTRLCOOKIE;
+
+    typedef enum EXTENDERMEMID { // ???
+        EXTENDER_MemidLow = 0x80010000,
+        EXTENDER_MemidHigh = 0x80010000,
+
+        MEMID_Name = 0x80010000,
+        MEMID_Parent = 0x80010008,
+        MEMID_Delete = -801,
+        MEMID_Object = -802,
+    } EXTENDERMEMID;
+
+    // ---
+
+    typedef enum VBA_BRKONERR { // ???
+        VBA_BRKONERR_BreakOnAllErrors = 0,
+        VBA_BRKONERR_BreakOnServerErrors = 1,
+        VBA_BRKONERR_None = 2,
+    } VBA_BRKONERR;
+
+    typedef enum VBAHASHTYPE {
+        VBAHASHTYPE_Md5Text = 1,
+        VBAHASHTYPE_Md5Compiled = 2,
+        VBAHASHTYPE_Sha1Compiled = 3,
+    } VBAHASHTYPE;
+
+    typedef enum VBACALENDAR /* : DWORD */ { // Identical to VBA::VbCalendar
+        VBACALENDAR_Greg = 0,
+        VBACALENDAR_Hijri = 1,
+    } VBACALENDAR;
+
+    #endif
+    
+    // --- Structs ---
+    #if 1
+    
+    typedef struct VBAAPPOBJDESC {
+        UINT uVerMaj;
+        UINT uVerMin;
+        GUID guidTypelibAppObj;
+        GUID guidTypeinfoAppObj;
+    } VBAAPPOBJDESC;
+    
+    typedef struct VBASAPROJINFO {
+        LPCOLESTR lpstrHostApp;
+        LPCOLESTR lpstrRegPath;
+        VBAAPPOBJDESC vaodHost;
+        VBASAPROJTYPE vsaptType;
+        VBASAFLAGS vsaFlags;
+    } VBASAPROJINFO;
+    
+    typedef struct VBAINITINFO {
+        UINT cbSize;
+        DWORD dwFlags;
+        /* IMsoComponentManager* */ void* pMsoCompMgr;
+        IVbaSite* pVbaSite;
+        LPCOLESTR lpstrName;
+        LPCOLESTR lpstrRegKey;
+        LCID lcidUserInterface;
+        IUnknown* punkAppObject;
+        LPCOLESTR lpstrProjectFileFilter;
+        HWND hwndHost;
+        HINSTANCE hinstHost;
+        IVbaCompManagerSite* pVbaCompManagerSite;
+        GUID guidReserved;
+        UINT cSAProjTypes;
+        VBASAPROJINFO* rgvsapiProjTypes;
+        VBAAPPOBJDESC vaodHost;
+        LPCOLESTR lpstrDigSigVerifyProjectHelpFile;  
+        DWORD dwDigSigVerifyProjectContextID;    
+        HINSTANCE hinstReserved;
+    } VBAINITINFO;
+    
+    typedef struct VBA_PROC_CHANGE_INFO {
+        IVbaProjItem* pvbaprojitem;
+        LPCOLESTR lpstrObjectName;
+        LPCOLESTR lpstrProcName;
+        INVOKEKIND invokekind;
+    } VBA_PROC_CHANGE_INFO;
+    
+    typedef struct VBAINITHOSTADDININFO {
+        DWORD dwCookie;
+        LPCOLESTR lpstrRegPath;
+        LCID lcidHost;
+        DWORD dwFlags;
+        BOOL fRemoveFromListOnFailure;
+        IDispatch* pdisp;
+    } VBAINITHOSTADDININFO;
+    
+    typedef struct VBA_BRK_INFO {
+        VBA_BRKOPT brkopt;
+        VBA_BRKREASON brkreason;
+    } VBA_BRK_INFO;
+    
+    typedef struct VBAPROC {
+        BSTR bstrName;
+        INVOKEKIND invokekind;
+        VBAPROCFLAGS vbaprocflags;
+        IVbaProjItem* pVbaProjItem;
+    } VBAPROC;
+    
+    // ---
+
+    typedef struct VBAHASH {
+        VBAHASHTYPE vbahashtype;
+        BSTR bstrHash;
+        BOOL fNotCurrentVersion;
+    } VBAHASH;
+
+    #endif
+    
+    // --- Designer Interfaces ---
+    #if 1
+
+    [uuid(51AAE3E0-7486-11cf-A0C2-00AA0062BE57)]
+    interface IActiveDesigner : IUnknown {
+        HRESULT GetRuntimeClassID(CLSID* pclsid);
+        HRESULT GetRuntimeMiscStatusFlags(DWORD* pdwMiscFlags);
+        HRESULT QueryPersistenceInterface(REFIID riidPersist);
+        HRESULT SaveRuntimeState(REFIID riidPersist, REFIID riidObjStgMed, void* pObjStgMed);
+        HRESULT GetExtensibilityObject(IDispatch** ppvObjOut);
+    };
+
+    [uuid(6d5140c4-7436-11ce-8034-00aa006009fa)]
+    interface ICodeNavigate : IUnknown {
+        HRESULT DisplayDefaultEventHandler([in] LPCOLESTR lpstrObjectName);
+    };
+
+    [uuid(2702ad60-3459-11d1-88fd-00a0c9110049)]
+    interface ICodeNavigate2 : ICodeNavigate {
+        HRESULT DisplayEventHandler([in] LPCOLESTR lpstrObjectName, LPCOLESTR lpstrEventName);
+    };
+
+    [uuid(6d5140c6-7436-11ce-8034-00aa006009fa)]
+    interface ISelectionContainer : IUnknown {
+        HRESULT CountObjects([in] DWORD dwFlags, [out] ULONG* pc);
+        HRESULT GetObjects([in] DWORD dwFlags, [in] ULONG cObjects, [out] IUnknown** apUnkObjects);
+        HRESULT SelectObjects([in] ULONG cSelect, [in] IUnknown** apUnkSelect, [in] DWORD dwFlags);
+    };
+
+    [uuid(6d5140c5-7436-11ce-8034-00aa006009fa)]
+    interface ITrackSelection : IUnknown {
+        HRESULT OnSelectChange([in] ISelectionContainer* pSC);
+    };
+
+    [uuid(718cc500-0a76-11cf-8045-00aa006009fa)]
+    interface IProfferTypeLib : IUnknown {
+        HRESULT ProfferTypeLib([in] REFGUID guidTypeLib, [in] UINT uVerMaj, [in] UINT uVerMin, [in] DWORD dwFlags);
+    };
+
+    [uuid(468cfb80-b4f9-11cf-80dd-00aa00614895)]
+    interface IProvideDynamicClassInfo : IUnknown {
+        HRESULT GetDynamicClassInfo(ITypeInfo** ppTI, DWORD* pdwCookie);
+        HRESULT FreezeShape();
+    };
+
+    #endif
+
+    // --- Object Extensions Interfaces ---
+    #if 1
+
+    //#define IClassDesigner IDocumentSite
+    //typedef IDocumentSite IClassDesigner;
+
+    [uuid(94A0F6F1-10BC-11d0-8D09-00A0C90F2732)]
+    interface IDocumentSite : IUnknown {
+        HRESULT SetSite([in] IServiceProvider* pSP);
+        HRESULT GetSite([out] IServiceProvider** ppSP);
+        HRESULT GetCompiler([in] REFIID iid, [out] void** ppvObj);
+        HRESULT ActivateObject(DWORD dwFlags);
+        HRESULT IsObjectShowable();
+    };
+
+    [uuid(61D4A8A1-2C90-11d2-ADE4-00C04F98F417)]
+    interface IDocumentSite2 : IDocumentSite {
+        HRESULT GetObject([out] IDispatch** ppdispObj);
+    };
+
+    [uuid(6d5140d0-7436-11ce-8034-00aa006009fa)]
+    interface IRequireClasses : IUnknown {
+        HRESULT CountRequiredClasses([out] ULONG* pcClasses);
+        HRESULT GetRequiredClasses([in] ULONG index, [out] CLSID* pclsid);
+    };
+
+    [uuid(6d5140d4-7436-11ce-8034-00aa006009fa)]
+    interface ILicensedClassManager : IUnknown {
+        HRESULT OnChangeInRequiredClasses([in] IRequireClasses* pRequireClasses);
+    };
+
+    [uuid(6d5140d6-7436-11ce-8034-00aa006009fa)]
+    interface IExtendedTypeLib : IUnknown {
+        HRESULT CreateExtendedTypeLib([in] LPCOLESTR lpstrCtrlLibFileName, [in] LPCOLESTR lpstrLibNamePrepend, [in] ITypeInfo* ptinfoExtender, [in] DWORD dwReserved, [in] DWORD dwFlags, [in] LPCOLESTR lpstrDirectoryName, [out] ITypeLib** pptlib);
+        HRESULT AddRefExtendedTypeLib([in] LPCOLESTR lpstrCtrlLibFileName, [in] LPCOLESTR lpstrLibNamePrepend, [in] ITypeInfo* ptinfoExtender, [in] DWORD dwReserved, [in] DWORD dwFlags, [in] LPCOLESTR lpstrDirectoryName, [out] ITypeLib** pptlib);
+        HRESULT AddRefExtendedTypeLibOfClsid([in] REFCLSID rclsidControl, [in] LPCOLESTR lpstrLibNamePrepend, [in] ITypeInfo* ptinfoExtender, [in] DWORD dwReserved, [in] DWORD dwFlags, [in] LPCOLESTR lpstrDirectoryName, [out] ITypeInfo** pptinfo);
+        HRESULT SetExtenderInfo([in] LPCOLESTR lpstrDirectoryName, [in] ITypeInfo* ptinfoExtender, [in] DWORD dwReserved);
+    };
+
+    [uuid(6d5140d3-7436-11ce-8034-00aa006009fa)]
+    interface ILocalRegistry : IUnknown {
+        HRESULT CreateInstance([in] CLSID clsid, [in] IUnknown* punkOuter, [in] REFIID riid, [in] DWORD dwFlags, [out] void** ppvObj);
+        HRESULT GetTypeLibOfClsid([in] CLSID clsid, [out] ITypeLib** ptlib);
+        HRESULT GetClassObjectOfClsid([in] REFCLSID clsid, [in] DWORD dwClsCtx, [in] LPVOID lpReserved, [in] REFIID riid, [out] void** ppcClassObject);
+    };
+
+    [uuid(759d0500-d979-11ce-84ec-00aa00614f3e)]
+    interface IUIElement : IUnknown {
+        HRESULT Show();
+        HRESULT Hide();
+        HRESULT IsVisible();
+    };
+
+    [uuid(cb728b20-f786-11ce-92ad-00aa00a74cd0)]
+    interface IProfferService : IUnknown {
+        HRESULT ProfferService([in] REFGUID rguidService, [in] IServiceProvider* psp, [out] DWORD* pdwCookie);
+        HRESULT RevokeService([in] DWORD dwCookie);
+    };
+
+    [uuid(4D07FC10-F931-11ce-B001-00AA006884E5)]
+    interface ICategorizeProperties : IUnknown {
+        HRESULT MapPropertyToCategory([in] DISPID dispid, [out] PROPCAT* ppropcat);
+        HRESULT GetCategoryName([in] PROPCAT propcat, [in] LCID lcid, [out] BSTR* pbstrName);
+    };
+
+    [uuid(6d5140c8-7436-11ce-8034-00aa006009fa)]
+    interface IHelp : IUnknown {
+        HRESULT GetHelpFile(BSTR* pbstr);
+        HRESULT GetHelpInfo(DWORD* pdwHelpInfo);
+        HRESULT ShowHelp(LPOLESTR szHelp, UINT fuCommand, DWORD dwHelpContext);
+    };
+
+    #endif
+
+    // --- Host Interfaces ---
+    #if 1
+    
+    [uuid(115dd106-2b24-11d2-aa6c-00c04f9901d2)]
+    interface IVbaSite : IUnknown {
+        HRESULT GetOwnerWindow(HWND* phwnd);
+        HRESULT Notify(VBASITENOTIFY vbahnotify);
+        HRESULT FindFile(LPCOLESTR lpstrFileName, BSTR* pbstrFullPath);
+        HRESULT GetMiniBitmap(REFGUID rgguid, HBITMAP* phbmp, COLORREF* pcrMask);
+        HRESULT CanEnterBreakMode(VBA_BRK_INFO* pbrkinfo);
+        HRESULT SetStepMode(VBASTEPMODE vbastepmode);
+        HRESULT ShowHide(BOOL fVisible);
+        HRESULT InstanceCreated(IUnknown* punkInstance);
+        HRESULT HostCheckReference(BOOL fSave, REFGUID rgguid, UINT* puVerMaj, UINT* puVerMin);
+        HRESULT GetIEVersion(LONG* plMajVer, LONG* plMinVer, BOOL* pfCanInstall);
+        HRESULT UseIEFeature(LONG lMajVer, LONG lMinVer, HWND hwndOwner);
+        HRESULT ShowHelp(HWND hwnd, LPCOLESTR szHelp, UINT wCmd, DWORD dwHelpContext, BOOL fWinHelp);
+        HRESULT OpenProject(HWND hwndOwner, IVbaProject* pVbaRefProj, LPCOLESTR lpstrFileName, IVbaProject** ppVbaProj);
+    };
+    
+    [uuid(E6806260-6C85-11d3-8D61-00C04FB17665)]
+    interface IVbaSite2 : IUnknown {
+        HRESULT FindFileWithVersion(LPCOLESTR lpstrFileName, BSTR* pbstrFullPath, WORD wMajor, WORD wMinor, LCID lcid);
+    };
+    
+    [uuid(AC7D567E-2A6F-11d4-B6B2-00C04FB17665)]
+    interface IVbaSite3 : IUnknown {
+        HRESULT FindFileWithVersion(LPCOLESTR lpstrFileName, BSTR* pbstrFullPath, WORD wMajor, WORD wMinor, LCID lcid, LPCOLESTR lpstrProjName);
+    };
+    
+    [uuid(1B30B6B8-E44B-11d1-9915-00A0C9702442)]
+    interface IVbaProjectSite : IUnknown {
+        HRESULT GetOwnerWindow(HWND* phwnd);
+        HRESULT Notify(VBAPROJSITENOTIFY vbapsn);
+        HRESULT GetObjectOfName(LPCOLESTR lpstrName, IDocumentSite** ppDocSite);
+        HRESULT LockProjectOwner(BOOL fLock, BOOL fLastUnlockCloses);
+        HRESULT RequestSave(HWND hwndOwner);
+        HRESULT ReleaseModule(IVbaProjItem* pVbaProjItem);
+        HRESULT ModuleChanged(IVbaProjItem* pVbaProjItem);
+        HRESULT DeletingProjItem(IVbaProjItem* pVbaProjItem);
+        HRESULT ModeChange(VBA_PROJECT_MODE pvbaprojmode);
+        HRESULT ProcChanged(VBA_PROC_CHANGE_INFO* pvbapcinfo);
+        HRESULT ReleaseInstances(IVbaProjItem* pVbaProjItem);
+        HRESULT ProjItemCreated(IVbaProjItem* pVbaProjItem);
+        HRESULT GetMiniBitmapGuid(IVbaProjItem* pVbaProjItem, GUID* pguidMiniBitmap);
+        HRESULT GetSignature(void** ppvSignature, DWORD* pcbSign);
+        HRESULT PutSignature(void* pvSignature, DWORD cbSign);
+        HRESULT NameChanged(IVbaProjItem* pVbaProjItem, LPCOLESTR lpstrOldName);
+        HRESULT ModuleDirtyChanged(IVbaProjItem* pVbaProjItem, BOOL fDirty);
+        HRESULT CreateDocClassInstance(IVbaProjItem* pVbaProjItem, CLSID clsidDocClass, IUnknown* punkOuter, BOOL fIsPredeclared, IUnknown** ppunkInstance);
+    };
+
+    [uuid(B3205671-FE45-11cf-8D08-00A0C90F2732)]
+    interface IVbaCompManagerSite : IUnknown {
+        HRESULT Notify(VBACMSITENOTIFY vbacmsn);
+        HRESULT EnterState(VBACOMPSTATE vbacompstate, BOOL fEnter);
+        HRESULT PushMessageLoop(VBALOOPREASON vbaloopreason, BOOL* pfAborted);
+        HRESULT ContinueIdle(BOOL* pfContinue);
+        HRESULT DoIdle();
+    };
+
+    [uuid(BCBCD7E0-B464-11cf-9F76-00AA00BDCC9A)]
+    interface IVbaMallocSpySite : IUnknown {
+        HRESULT BeginMarkAsIgnorable();
+        HRESULT EndMarkAsIgnorable();
+    };
+
+    #endif
+
+    // --- VBA Interfaces ---
+    #if 1
+    
+    [uuid(CD9B1AC5-FAA3-11d1-9922-00A0C9702442)]
+    interface IVbaProject : IUnknown {
+        HRESULT GetName([out, retval] BSTR* pbstrName);
+        HRESULT SetName([in] LPCOLESTR lpstrName);
+
+        HRESULT IsDirty([out, retval] BOOL* pfDirty);
+        HRESULT SetDirty([in] BOOL fDirty);
+
+        HRESULT GetVbaProcs([out, retval] IVbaProcs** ppVbaProcs);
+
+        HRESULT ParseLine([in] LPCOLESTR lpstrLine);
+        HRESULT ExecuteLine([in] LPCOLESTR lpstrLine);
+
+        HRESULT GetVbaObject([out, retval] IVba** ppvba);
+
+        HRESULT GetMode([out, retval] VBA_PROJECT_MODE* pmode);
+        HRESULT SetMode([in] VBA_PROJECT_MODE mode);
+
+        HRESULT GetProjItemCol([out, retval] IVbaProjItemCol** ppVbaProjItemCol);
+
+        HRESULT LoadComplete();
+
+        HRESULT SetFileName([in] LPCOLESTR lpstrPath);
+        HRESULT GetFileName([out, retval] BSTR* pbstrPath);
+        HRESULT Compile();
+
+        HRESULT Close();
+        HRESULT GetExtensibilityObject([out, retval] IDispatch** ppDispatch);
+        HRESULT Protect([in] BOOL fProtect);
+        HRESULT GetProtectionState([out, retval] PROTECTIONSTATE* lpProtectionState);
+        HRESULT SetDisplayName([in] LPCOLESTR lpstrDisplayName);
+
+        HRESULT AddTypeLibRef([in] GUID guidTypeLib, [in] UINT uVerMaj, [in] UINT uVerMin);
+        HRESULT LockForViewing([in] LPCOLESTR lpstrPassword, [in] BOOL fLock);
+        HRESULT IsCompiled([out, retval] BOOL* pfCompiled);
+
+        HRESULT SetDelayProtectionState([in] BOOL fDelayProtection);
+        HRESULT GetDelayProtectionState([out, retval] BOOL* pfDelayProtection);
+
+        HRESULT SignProject([in] IStorage* pStg);
+        HRESULT SetLoadFromText();
+        HRESULT DidLoadFromText([out, retval] BOOL* pfDidLoadFromText);
+    };
+
+    [uuid(A7870464-A8B9-4b0d-88D1-CD3B5C03CC15)]
+    interface IVbaProjectSecurity : IUnknown {
+        HRESULT SetFormsSFILevel([in] DWORD dwLevel);
+        HRESULT GetFormsSFILevel([out, retval] DWORD* pdwLevel);
+    };
+
+    [uuid(CD9B1AC6-FAA3-11d1-9922-00A0C9702442)]
+    interface IVbaProjItemCol : IUnknown {
+        HRESULT GetProjItemCount([out, retval] UINT* pucItems);
+        HRESULT GetProjItem([in] UINT uiItem, [out, retval] IVbaProjItem** ppVbaProjItem);
+        HRESULT GetProjItemOfName([in] LPCOLESTR lpstrName, [out, retval] IVbaProjItem** ppVbaProjItem);
+        HRESULT IsValidProjItemName([in] LPCOLESTR lpstrName, [out, retval] BOOL* pIsValid);
+        HRESULT DeleteProjItem([in] LPCOLESTR lpstrName);
+        HRESULT CopyProjItem([in] IVbaProjItem* pVbaProjItemToCopy, [in] LPCOLESTR lpstrNameNew, [in] IDocumentSite* pDocSite, [in] IVbaProjItem* pVbaPITemplateDoc, [out, retval] IVbaProjItem** ppVbaProjItemNew);
+        
+        HRESULT CreateDocumentProjItem([in] LPCOLESTR lpstrName, [in] IDocumentSite* pDocSite, [in] IVbaProjItem* pVbaPITemplateDoc, [out, retval] IVbaProjItem** ppVbaProjItem);
+        HRESULT CreateModuleProjItem([in] LPCOLESTR lpstrName, [in] VBAMODTYPE vbamodtype, [out, retval] IVbaProjItem** ppVbaProjItem);
+        HRESULT CreateDocClassProjItem([in] LPCOLESTR lpstrName, [in] IDocumentSite* pDocSite, [out, retval] IVbaProjItem** ppVbaProjItem);
+        HRESULT CreateDesignerProjItem([in] LPCOLESTR lpstrName, [in] CLSID clsidDesigner, [out, retval] IVbaProjItem** ppVbaProjItem);
+    };
+    
+    [uuid(CD9B1AC7-FAA3-11d1-9922-00A0C9702442)]
+    interface IVbaProjItem : IUnknown {
+        HRESULT GetContainingProject([out, retval] IVbaProject** ppvbaproj);
+
+        HRESULT GetName([out, retval] BSTR* pbstrName);
+        HRESULT SetName([in] LPCOLESTR lpstrName);
+
+        HRESULT IsDirty([out, retval] BOOL* pIsDirty);
+
+        HRESULT GetItemType([out, retval] VBAPROJITEMTYPE* ppit);
+
+        HRESULT SetDocumentTemplate([in] IVbaProjItem* pVbaPITemplateDoc);
+
+        HRESULT GetVbaProcs([out, retval] IVbaProcs** ppvbaprocs);
+
+        HRESULT InsertTextIntoModule([in] LPCOLESTR lpstrFileName);
+        HRESULT SetDisplayName([in] LPCOLESTR lpstrDisplayName);
+
+        HRESULT SetExtension([in] IUnknown* punkExt);
+
+        HRESULT CreateItemInstance([in] BOOL fSetPredeclaredId, [in] IUnknown* punkOuter, [out, retval] IUnknown** ppunkPrivate);
+
+        HRESULT GetPredeclaredId([out, retval] IUnknown** ppunkInstance);
+        HRESULT ResetPredeclaredId();
+
+        HRESULT LoadDocClass();
+        HRESULT Compile();
+        HRESULT SetDocClassBase([in] ITypeInfo* ptinfoBaseClass);
+    };
+    
+    [uuid(41833fb0-4548-11ce-89da-00fa00687610)]
+    interface IVbaProcs : IUnknown {
+        HRESULT GetProcs([in] VBAPROCFLAGS vbaprocflags, [in] DWORD dwInvokeKinds, [in] BOOL fSortByName, [out] UINT* pucProcs, [out] VBAPROC** pprgproc);
+        HRESULT FreeProcs([in] UINT ucProcs, [in] VBAPROC* prgproc);
+
+        HRESULT EditProc([in] LPCOLESTR lpstrProcName, [in] INVOKEKIND invokekind);
+        HRESULT DeleteProc([in] LPCOLESTR lpstrProcName, [in] INVOKEKIND invokekind);
+        HRESULT SetProcInfo([in] LPCOLESTR lpstrProcName, [in] LPCOLESTR szDescription, [in] LPCOLESTR szInfo);
+        HRESULT GetProcInfo([in] LPCOLESTR lpstrProcName, [out] BSTR* pbstrDescription, [out] BSTR* pbstrInfo);
+
+        HRESULT CallMacro([in] LPCOLESTR lpstrMacroName);
+        HRESULT BindProcDisp([in] LPCOLESTR lpstrProcName, [in] DWORD dwInvokeKinds, [in] BOOL fBindToPrivate, [out] IDispatch** ppdisp, [out] DISPID* pdispid, [out] INVOKEKIND* pinvokekind);
+        HRESULT DoesProcExist([in] LPCOLESTR lpstrObjName, [in] LPCOLESTR lpstrProcName, [out] BOOL* pfExists, [out] BOOL* pfEmpty);
+    };
+    
+    [uuid(41833fb0-4548-11ce-89da-00fa00688b10)]
+    interface IVbaRecorder : IUnknown {
+        HRESULT RecordStart([in] IVbaProject* pVbaProj, [in] IVbaProjItem* pVbaProjItem, [in] LPCOLESTR bstrMacroName);
+        HRESULT GetRecordMarkLocation([out] IVbaProject** ppVbaProj, [out] IVbaProjItem** pVbaProjItem);
+        HRESULT RecordEnd();
+        HRESULT RecordCancel();
+
+        HRESULT RecordLine([in] LPCOLESTR lpstr);
+        HRESULT BeginAction([in] UINT uActionId);
+        HRESULT EraseAction([in] UINT uActionId);
+
+        HRESULT IsValidIdentifier([in] LPCOLESTR lpstrIdent);
+        HRESULT GetKeyWord([in] UINT kwid, [out, retval] BSTR* pbstrKeyword);
+
+        HRESULT RecordGetMacroName([out, retval] BSTR* pbstrMacroName);
+    };
+    
+    [uuid(15B31E51-FE47-11cf-8D08-00A0C90F2732)]
+    interface IVbaCompManager : IUnknown {
+        HRESULT SetHostInfo([in] VBAINFOFLAGS vbainfoflags);
+
+        HRESULT OnHostActivate();
+        HRESULT OnWaitForMessage();
+
+        HRESULT OnHostEnterState([in] VBACOMPSTATE vbacompstate, [in] BOOL fEnter);
+        HRESULT InState([in] VBACOMPSTATE vbacompstate, [out, retval] BOOL* pfInState);
+
+        HRESULT DoIdle([in] VBAIDLEFLAGS vbaidleflags, [out, retval] BOOL* pfContinue);
+        HRESULT ContinueMessageLoop([in] BOOL fPushedByHost, [out, retval] BOOL* pfContinue);
+
+        HRESULT PreTranslateMessage([in] MSG* pMsg, [out, retval] BOOL* pfConsumed);
+
+        HRESULT InitiateReset();
+    };
+    
+    [uuid(CD9B1AC8-FAA3-11d1-9922-00A0C9702442)]
+    interface IVba : IUnknown {
+        HRESULT GetVersionInfo([out] UINT* puVerMaj, [out] UINT* puVerMin, [out] UINT* puVerRef, [out] BOOL* pfDebug);
+
+        HRESULT CreateProject([in] VBAPROJFLAGS vbaprojflags, [in] IVbaProjectSite* pProjSite, [out, retval] IVbaProject** ppProj);
+
+        HRESULT ShowError([in] HRESULT hres);
+
+        HRESULT SetStepMode([in] VBASTEPMODE vbasm);
+
+        HRESULT GetMode([out, retval] VBA_PROCESS_MODE* pmode);
+
+        HRESULT GetRecorder([out, retval] IVbaRecorder** ppVbaRec);
+
+        HRESULT IsExecutingWatchExpression([out, retval] BOOL* pfExecWatch);
+        HRESULT GetExecutingProject([out, retval] IVbaProject** ppVbaProj);
+        HRESULT GetExtensibilityObject([out, retval] IDispatch** ppDispatch);
+
+        HRESULT Reset();
+        HRESULT CreateExtension([in] IUnknown* punkOuter, [in] IUnknown* punkBase, [in] IUnknown* punkExtender, [out, retval] IUnknown** ppunkExtension);
+
+        HRESULT NotifyUserInterrupt([in] DWORD dwReserved);
+        HRESULT GetCompManager([out, retval] IVbaCompManager** ppVbaCompManager);
+
+        HRESULT GetExecutingInstance([out, retval] IUnknown** ppunkInstance);
+        HRESULT BuildErrorInfo([in] HRESULT hres, [out, retval] IErrorInfo** pperrinfo);
+
+        HRESULT QueryTerminate([out, retval] BOOL* pfCanTerminate);
+
+        HRESULT VerifyProject([in] IStorage* pStg, [in] void* pvSignature, [out] VBAMACROENABLESTATE* pdsMacroState, [in] VBADIGSIGSECURITYLEVEL uiSecurityLevel, [in] LPCOLESTR lpcszFileName, [out] BOOL* pfLoadFromText);
+
+        HRESULT DlgSetSecurityLevel([in, out] VBADIGSIGSECURITYLEVEL* pSecurityLevel, LPVOID lpReserved);
+
+        HRESULT SupportDesigner([in] CLSID clsidDesigner, [in] BOOL fSupport);
+
+        HRESULT PreTerminate();
+        HRESULT UpgradeStorage([in] USHORT usVerDelta);
+    };
+    
+    [uuid(9E7BE5EB-C1DA-11d1-AA7E-00C04FC2F1BF)]
+    interface IVbaHostAddins : IUnknown {
+        HRESULT GetAddIns([out, retval] IDispatch** ppdispAddins);
+        HRESULT OnHostStartupComplete();
+        HRESULT OnHostBeginShutdown();
+        HRESULT ShowAddInsDialog([in] HWND hparentwin);
+        HRESULT LoadHostAddins();
+    };
+    
+    [uuid(9849FD60-3768-101B-8D72-AE6164FFE3CF)]
+    interface IVbaFormat : IUnknown {
+        HRESULT Format([in] LPVARIANT lpVarData, [in] LPCOLESTR szFormat, [in, out] LPVOID lpBuffer, [in] USHORT cbBuffer, [in] LCID lcid, [in] USHORT sFirstDayOfWeek, [in] USHORT sFirstWeekOfYear, [out] USHORT* pcbResult);
+    };
+    
+    [uuid(B53BA860-3768-101B-8D72-00DD010EDFAA)]
+    interface IVbaFiles : IUnknown {
+        HRESULT Read([in] USHORT usFileNo, [in, out] LPVOID lpBuffer, [in] UINT cb);
+        HRESULT Write([in] USHORT usFileNo, [in] LPVOID lpBuffer, [in] UINT cb);
+        HRESULT Seek([in] USHORT usFileNo, [in] LONG lOffset, [out, retval] LONG* plPos);
+        HRESULT SeekRel([in] USHORT usFileNo, [in] LONG lOffset, [out, retval] LONG* plPos);
+    };
+    
+    // ---
+
+    [uuid(3b82b7df-3a30-11d1-98c3-00a0c9702442)]
+    interface IVbaEx : IUnknown {
+        HRESULT GetExprSrv([out] void** ppvExprSrv, [in] USHORT usVerMaj, [in] USHORT usVerMin); // Version must be 4.0
+        HRESULT SetCommandLine([in] LPCOLESTR szCmdLine);
+        HRESULT GetInfoOfLib([in] LPCOLESTR szRefLib, [out] GUID* pguidTypeLib, [out] UINT* puVerMaj, [out] UINT* puVerMin, [out] DWORD* pdwFlags);
+        HRESULT SetBrkOnErrOption([in] VBA_BRKONERR vbabrkonerr);
+        HRESULT GetBrkOnErrOption([out, retval] VBA_BRKONERR* pvbabrkonerr);
+        HRESULT __Unknown1([in] ULONG); // Always S_OK
+        HRESULT ViewImmediateWindow();
+    };
+
+    [uuid(7598b9ab-d645-4999-b2c9-7b7003c6d3b3)]
+    interface IVbaProject2 : IUnknown {
+        HRESULT SetRequireMalwareScan([in] BOOL fRequireScan);
+    };
+
+    [uuid(978684b1-ff8c-11cf-8d08-00a0c90f2732)]
+    interface IVbaProjectEx : IUnknown {
+        HRESULT SetHelpFile([in] LPCOLESTR szHelpFile);
+        HRESULT GetHelpFile([out, retval] BSTR* pbstrHelpFile);
+        HRESULT GetLcidOriginal([out, retval] LCID* plcid);
+        HRESULT GetHashOfCode([in, out] VBAHASH* pvbahash); // Set pvbahash->vbahashtype before calling
+        HRESULT GetTypeLib([out, retval] ITypeLib** ppTypeLib);
+        HRESULT SetDatabaseLcid([in] LCID lcid);
+        HRESULT SetCalendar([in] VBACALENDAR vbacalendar);
+        HRESULT GetLibIdOfRefLib([in] USHORT usIndex, [out] BSTR* pbstrRefLib, [out] BOOL* pfIsDefault);
+        HRESULT MakeMDE([in] IStorage* pStg);
+        BOOL IsMDE();
+        HRESULT SetConstValues([in] LPCOLESTR szValues);
+        HRESULT GetConstValues([out, retval] BSTR* pbstrValues);
+    };
+
+    [uuid(5a21752c-1d54-11d4-b6ad-00c04fb17665)]
+    interface IVbaProjectEx2 : IUnknown {
+        HRESULT RemoveReference([in] LPCOLESTR szReference);
+    };
+
+    #endif
+
+    // --- Control Programmability Interfaces ---
+    #if 1
+    
+    [uuid(91733A60-3F4C-101B-A3F6-00AA0034E4E9)]
+    interface IGetVBAObject : IUnknown {
+        HRESULT GetObject(REFIID riid, void** ppvObj, DWORD dwReserved);
+    };
+    
+    // ---
+
+    [uuid(5bd18670-e2fa-11ce-8229-00aa004440d0)]
+    interface IControlDesign : IUnknown {
+        HRESULT DefineControl(DWORD dwflags, ITypeInfo* ptinfo, DWORD dwCtlCookie, LPCOLESTR szName);
+        HRESULT UndefineControl(DWORD flags, DWORD dwCtlCookie);
+        HRESULT HideControl(DWORD dwCtlCookie, BOOL fHide);
+    };
+    
+    [uuid(3402ea80-e2fa-11ce-8229-00aa004440d0)]
+    interface IControlRT : IUnknown {
+        HRESULT ForceControlCreation(DWORD dwflags, DWORD dwCtlCookie);
+    };
+
+    [uuid(bc863490-e675-11ce-8229-00aa004440d0)]
+    interface IControlContainer : IUnknown {
+        HRESULT Init(IControlRT* pctrlRT);
+        HRESULT GetControlParts(DWORD dwflags, DWORD dwCtlCookie, IUnknown* punkOuter, DWORD* pdwRTCookie, IUnknown** ppunkExtender, IUnknown** ppunkprivControl, IOleControlSite** ppocs);
+        HRESULT CopyControlParts(DWORD dwflags, DWORD dwCtlCookieTemplate, IUnknown* punkOuter, DWORD* pdwCltCookie, DWORD* pdwRTCookie, IUnknown** ppunkExtender, IUnknown** ppunkprivControl, IOleControlSite** ppocs);
+        HRESULT SetExtenderEventSink(DWORD dwCtlCookie, IUnknown* punkSink, IPropertyNotifySink* ppropns);
+    };
+
+    [uuid(3676f490-e2fa-11ce-8229-00aa004440d0)]
+    interface IProvideControls : IUnknown {
+        HRESULT GetControls(DWORD cControls, DWORD rgCtrlPropCookie[], IUnknown* rgpunk[]);
+        HRESULT SetSink(DWORD* pdwCookie, IDispatch* pdispSink);
+    };
+
+    [uuid(9FB0EDBB-AD3F-43EC-87E1-5839A09EEE39)] // ???
+    interface IControlInfo : IUnknown {
+        HRESULT SetName(BSTR bstrName);
+        HRESULT GetName(BSTR* pbstrName);
+        HRESULT GetParent(IControlContainer** ppctrlcont);
+        HRESULT GetTypeInfo(UINT itinfo, LCID lcid, ITypeInfo** pptinfo);
+    };
+
+    [uuid(f27be360-1b98-11cf-84fc-00aa00a71dcb)]
+    interface IFreezeEvents : IUnknown {
+        HRESULT FreezeEvents(BOOL fFreeze);
+    };
+
+    #endif
+
+    // --- CoClasses ---
+    #if 1
+
+    // NOTE: These are only for reference purposes and not for actual consumption
+
+    [uuid(cd9b1ac9-faa3-11d1-9922-00a0c9702442)]
+    [noncreatable]
+    [hidden]
+    coclass CVbe {
+        interface IVba;
+        interface IVbaEx;
+        interface IServiceProvider;
+        // ...
+    };
+
+    [uuid(ddd557e3-d96f-11cd-9570-00aa0051e5d4)]
+    [noncreatable]
+    [hidden]
+    coclass CVbeProject {
+        interface IVbaProject;
+        interface IVbaProject2;
+        interface IVbaProjectEx;
+        interface IVbaProjectEx2;
+        interface IPersistStorage;
+        // ...
+    };
+
+    #endif
+};
+
